@@ -85,7 +85,11 @@ export default function CalculatorPage() {
     };
 
     try {
-        const result = await createOrder({ price, details });
+        const result = await createOrder({ 
+            title: `Заказ ${mode === 'file' ? file?.name || '' : 'по параметрам'}`,
+            price, 
+            details 
+        });
 
         if (result.error === 'Unauthorized') {
         router.push('/login?redirect=/calculator');

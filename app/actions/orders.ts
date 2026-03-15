@@ -12,6 +12,7 @@ const prisma = new PrismaClient()
 export async function createOrder(data: {
   title: string;
   details: any;
+  price?: number;
 }) {
   const session = await getSession()
   if (!session || !session.userId) {
@@ -24,7 +25,7 @@ export async function createOrder(data: {
         userId: parseInt(session.userId),
         title: data.title,
         status: 'pending',
-        price: 0, // Price is set by admin later
+        price: data.price || 0,
         details: JSON.stringify(data.details, null, 2),
       },
       include: {
