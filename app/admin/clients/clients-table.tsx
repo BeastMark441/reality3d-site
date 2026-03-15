@@ -94,13 +94,13 @@ export default function ClientsTable({ currentUserRole }: { currentUserRole: str
   };
 
   const handleDelete = async (id: number) => {
-    if (!confirm("Вы уверены, что хотите удалить этого клиента? Это действие необратимо.")) return;
+    if (!confirm("Вы уверены, что хотите удалить этого клиента? Все данные, включая историю заказов и переписку, будут удалены безвозвратно.")) return;
     
     const res = await deleteClient(id);
     if (res.success) {
       loadClients();
     } else {
-      alert("Ошибка при удалении клиента");
+      alert(res.error || "Ошибка при удалении клиента");
     }
   };
 

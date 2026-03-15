@@ -71,35 +71,60 @@ export async function deleteClient(id: number) {
   }
 
   try {
-    // Delete dependencies first if cascade is not set
-    // Deleting orders, chat messages, sessions, etc.
-    // For now assuming we just want to delete the user and rely on Prisma relations or handle it here
-    
-    // Simple delete for now. If there are relations without cascade, this might fail.
-    // Let's rely on Prisma to throw if something is wrong, or handle related data deletion.
-    
-    // Deleting chat messages
-    // const chatSessions = await prisma.chatSession.findMany({ where: { userId: id } })
-    // for (const chat of chatSessions) {
-    //     await prisma.chatMessage.deleteMany({ where: { sessionId: chat.id } })
-    //     await prisma.chatSession.delete({ where: { id: chat.id } })
-    // }
-    
-    // Deleting orders
-    // await prisma.order.deleteMany({ where: { userId: id } })
+    // We need to delete all related data manually because cascade is not set in schema
+    await prisma.$transaction(async (tx) => {
+      // 1. Delete comments on user's orders and user's own comments
+      await tx.orderComment.deleteMany({
+        where: {
+          OR: [
+            { userId: id },
+            { order: { userId: id } }
+          ]
+        }
+      })
 
-    // Actually, let's keep it simple. If it fails due to FK, we'll see. 
-    // Usually we should probably archive instead of delete, but request is "delete".
-    
-    await prisma.user.delete({
-      where: { id }
+      // 2. Delete reviews
+      await tx.review.deleteMany({
+        where: { userId: id }
+      })
+
+      // 3. Delete chat messages in user's sessions and sent by user
+      await tx.chatMessage.deleteMany({
+        where: {
+          OR: [
+            { senderId: id },
+            { session: { userId: id } },
+            { session: { order: { userId: id } } }
+          ]
+        }
+      })
+
+      // 4. Delete chat sessions
+      await tx.chatSession.deleteMany({
+        where: {
+          OR: [
+            { userId: id },
+            { order: { userId: id } }
+          ]
+        }
+      })
+
+      // 5. Delete orders
+      await tx.order.deleteMany({
+        where: { userId: id }
+      })
+
+      // 6. Delete the user
+      await tx.user.delete({
+        where: { id }
+      })
     })
 
     revalidatePath('/admin/clients')
     return { success: true }
   } catch (error) {
     console.error('Error deleting client:', error)
-    return { error: 'Failed to delete client' }
+    return { error: 'Failed to delete client with history' }
   }
 }
 
