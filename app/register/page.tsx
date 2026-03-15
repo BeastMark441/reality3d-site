@@ -38,10 +38,10 @@ export default function RegisterPage() {
         </div>
 
         <form className="space-y-4" action={formAction}>
-           {state?.errors?.email && (
+           {(state?.errors as any)?.email && (
              <div className="bg-red-500/10 border border-red-500/20 text-red-500 text-sm p-3 rounded-lg flex items-center gap-2">
                <AlertCircle className="h-4 w-4" />
-               {state.errors.email[0]}
+               {(state?.errors as any).email[0]}
              </div>
            )}
            {captchaError && (
@@ -51,48 +51,46 @@ export default function RegisterPage() {
              </div>
            )}
 
-           <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Имя</label>
-              <input 
+           <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-400 ml-1">Имя</label>
+              <input
                 name="name"
-                type="text" 
-                placeholder="Иван Иванов"
-                className="w-full bg-slate-900/50 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
+                type="text"
                 required
-                maxLength={30}
+                className={cn(
+                  "w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all",
+                  (state?.errors as any)?.name && "border-red-500/50"
+                )}
+                placeholder="Иван Иванов"
               />
-              <p className="text-xs text-gray-500 mt-1">До 30 символов.</p>
-              {state?.errors?.name && (
-                <p className="text-red-500 text-xs mt-1">{state.errors.name[0]}</p>
-              )}
            </div>
 
-           <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Email</label>
-              <input 
+           <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-400 ml-1">Email</label>
+              <input
                 name="email"
-                type="email" 
-                placeholder="client@example.com"
-                className="w-full bg-slate-900/50 border border-slate-800 rounded-lg px-4 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
+                type="email"
                 required
-                maxLength={30}
-                pattern="[a-zA-Z0-9@._-]+"
-                title="Только латинские буквы, цифры и символы @ . _ -"
+                className={cn(
+                  "w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all",
+                  (state?.errors as any)?.email && "border-red-500/50"
+                )}
+                placeholder="client@example.com"
               />
-              <p className="text-xs text-gray-500 mt-1">Только латинские буквы, до 30 символов.</p>
            </div>
-           
-           <div>
-              <label className="block text-sm font-medium text-gray-400 mb-1">Пароль</label>
+
+           <div className="space-y-2">
+              <label className="text-sm font-medium text-gray-400 ml-1">Пароль</label>
               <div className="relative">
-                <input 
+                <input
                   name="password"
-                  type={showPassword ? "text" : "password"} 
-                  placeholder="••••••••"
-                  className="w-full bg-slate-900/50 border border-slate-800 rounded-lg pl-4 pr-10 py-3 text-white focus:outline-none focus:border-primary/50 transition-colors"
+                  type={showPassword ? "text" : "password"}
                   required
-                  maxLength={20}
-                  minLength={6}
+                  className={cn(
+                    "w-full bg-slate-900 border border-slate-800 rounded-xl px-4 py-3 text-white focus:outline-none focus:ring-2 focus:ring-primary/50 transition-all pr-12",
+                    (state?.errors as any)?.password && "border-red-500/50"
+                  )}
+                  placeholder="••••••••"
                 />
                 <button
                   type="button"
